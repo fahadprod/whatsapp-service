@@ -4,7 +4,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "scan": "node server-local.js"
+    "scan": "node server-local.js",
+    "build": "echo 'No build step required'"
   },
   "engines": {
     "node": ">=20.x"
