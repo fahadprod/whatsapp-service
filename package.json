@@ -6,6 +6,9 @@
     "start": "node server.js",
     "scan": "node server-local.js"
   },
+  "engines": {
+    "node": ">=20.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
