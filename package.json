@@ -12,12 +12,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Expirel WhatsApp Service with Baileys",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.4.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "pino": "^8.15.0"
+    "pino": "^8.15.0",
+    "qrcode": "^1.5.4"
   }
 }
