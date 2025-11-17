@@ -209,7 +209,7 @@ function formatExpiryMessage(data) {
     } else if (data.days_until_expiry === 1) {
         expiryStatus = '*expires TOMORROW* ⚠️';
     } else {
-        expiryStatus = `*expires in ${data.days_until_expiry} days* 📅`;
+        expiryStatus = `*expires in ${data.days_until_expiry} days*`;
     }
 
     const urgencyEmoji = data.days_until_expiry <= 3 ? '🚨' : '⏰';
@@ -227,9 +227,11 @@ function formatExpiryMessage(data) {
 ${tip}
 
 ━━━━━━━━━━━━━━━━
-_Expirel - Your expiry tracking assistant_`;
-}
+📱 *Manage your expiry alerts:*
+https://expirel.com/
 
+_Expirel - Smart expiry tracking made simple_`;
+}
 // ============== ROUTES ==============
 
 app.get('/', (req, res) => {
