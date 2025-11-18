@@ -69,7 +69,7 @@ async function initializeWhatsApp() {
             if (qr) {
                 console.log('\n📱 QR Code generated!');
                 console.log('🌐 View QR: http://localhost:' + (process.env.PORT || 3001) + '/qr\n');
-                
+
                 try {
                     // Generate QR code as base64 image
                     qrCodeData = await qrcode.toDataURL(qr);
@@ -85,7 +85,7 @@ async function initializeWhatsApp() {
                 isInitializing = false;
                 qrCodeData = null;
                 connectionAttempts = 0;
-                
+
                 console.log('\n╔═══════════════════════════════════════════════════╗');
                 console.log('║   ✅ WHATSAPP CONNECTED SUCCESSFULLY!             ║');
                 console.log('╚═══════════════════════════════════════════════════╝\n');
@@ -98,10 +98,10 @@ async function initializeWhatsApp() {
                 isReady = false;
                 isInitializing = false;
                 qrCodeData = null;
-                
+
                 const statusCode = lastDisconnect?.error?.output?.statusCode;
                 const reason = lastDisconnect?.error?.output?.payload?.error;
-                
+
                 console.log('\n⚠️ Connection closed');
                 console.log('   Reason:', reason || 'Unknown');
                 console.log('   Status Code:', statusCode);
@@ -109,26 +109,26 @@ async function initializeWhatsApp() {
                 if (statusCode === DisconnectReason.loggedOut) {
                     console.log('\n❌ Device logged out - Clearing auth data');
                     console.log('   You need to scan QR code again\n');
-                    
+
                     // Clear auth data
                     if (fs.existsSync(authDir)) {
                         fs.rmSync(authDir, { recursive: true, force: true });
                         fs.mkdirSync(authDir, { recursive: true });
                     }
-                    
+
                     // Wait 5 seconds then reinitialize
                     setTimeout(() => {
                         console.log('🔄 Reinitializing for new QR code...\n');
                         initializeWhatsApp();
                     }, 5000);
-                    
+
                 } else if (statusCode === DisconnectReason.restartRequired) {
                     console.log('🔄 Restart required, reconnecting...\n');
                     setTimeout(() => initializeWhatsApp(), 3000);
-                    
+
                 } else if (statusCode === DisconnectReason.timedOut) {
                     console.log('⏱️ Connection timed out, retrying...\n');
-                    
+
                     if (connectionAttempts < MAX_RECONNECT_ATTEMPTS) {
                         connectionAttempts++;
                         console.log(`   Attempt ${connectionAttempts}/${MAX_RECONNECT_ATTEMPTS}\n`);
@@ -138,7 +138,7 @@ async function initializeWhatsApp() {
                         console.log('   Please restart the service or check your connection\n');
                         connectionAttempts = 0;
                     }
-                    
+
                 } else {
                     console.log('🔄 Reconnecting...\n');
                     setTimeout(() => initializeWhatsApp(), 5000);
@@ -213,11 +213,15 @@ function formatExpiryMessage(data) {
     }
 
     const urgencyEmoji = data.days_until_expiry <= 3 ? '🚨' : '⏰';
-    const category = data.product_category ? `\n📦 *Category:* ${data.product_category}` : '';
-    const tip = data.days_until_expiry <= 3 
-        ? '⚠️ *URGENT:* Please use this item soon to avoid waste!' 
+    const category = data.product_category
+        ? `\n📦 *Category:* ${data.product_category}`
+        : '';
+
+    const tip = data.days_until_expiry <= 3
+        ? '⚠️ *URGENT:* Please use this item soon to avoid waste!'
         : '💡 *Tip:* Plan to use this item in the coming days.';
 
+    // FIX: Put URL on its own line without any formatting before/after it
     return `${urgencyEmoji} *EXPIRY REMINDER*
 
 🏷️ *Product:* ${data.product_name}${category}
@@ -228,7 +232,7 @@ ${tip}
 
 ━━━━━━━━━━━━━━━━
 📱 *Manage your expiry alerts:*
-https://expirel.com/
+https://expirel.com
 
 _Expirel - Smart expiry tracking made simple_`;
 }
@@ -560,7 +564,7 @@ app.post('/init', async (req, res) => {
     if (isReady) {
         return res.json({ success: true, message: 'Already connected' });
     }
-    
+
     initializeWhatsApp();
     res.json({ success: true, message: 'Initialization started' });
 });
