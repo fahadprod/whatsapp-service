@@ -231,10 +231,13 @@ function formatExpiryMessage(data) {
 ${tip}
 
 ━━━━━━━━━━━━━━━━
-📱 *Manage your expiry alerts:*
-https://expirel.com
 
-_Expirel - Smart expiry tracking made simple_`;
+_Expirel - Smart expiry tracking made simple_
+
+📱 *Manage your expiry alerts:*
+
+https://expirel.com
+`;
 }
 // ============== ROUTES ==============
 
