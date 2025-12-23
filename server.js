@@ -11,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const habitRoutes = require('./routes/habits');
+app.use('/api', habitRoutes);
+
 let sock = null;
 let isReady = false;
 let isInitializing = false;
@@ -561,6 +564,119 @@ app.post('/send', async (req, res) => {
             error: error.message
         });
     }
+});
+
+// Format habit reminder message
+function formatHabitMessage(data) {
+    const userName = data.user_name || 'there';
+    const habitIcon = data.habit_icon || '📝';
+    const habitName = data.habit_name;
+    const habitDescription = data.habit_description;
+
+    const motivationalTips = [
+        '💪 *Tip:* Consistency is key! Small daily actions lead to big results.',
+        '🌟 *Tip:* Every habit you complete brings you closer to your goals.',
+        '🎯 *Tip:* Focus on progress, not perfection. Keep moving forward!',
+        '✨ *Tip:* You\'re building a better version of yourself, one habit at a time.',
+        '🚀 *Tip:* The best time to start was yesterday. The next best time is now!'
+    ];
+
+    const randomTip = motivationalTips[Math.floor(Math.random() * motivationalTips.length)];
+
+    const descriptionText = habitDescription
+        ? `\n📝 *Details:* ${habitDescription}\n`
+        : '';
+
+    return `Hi ${userName}! 👋
+
+🎯 *HABIT REMINDER*
+
+${habitIcon} *${habitName}*${descriptionText}
+⏰ It's time to complete your habit!
+
+Every small step counts towards building a better you. Let's keep the momentum going! 🌟
+
+${randomTip}
+
+━━━━━━━━━━━━━━━━
+
+_Expirel - Build better habits, build a better you_
+
+📱 *Track your progress:*
+
+https://expirel.com/dashboard/habits/all
+`;
+}
+
+// Route for habit reminders
+app.post('/send-habit', async (req, res) => {
+    try {
+        if (!isReady) {
+            if (!isInitializing) {
+                initializeWhatsApp();
+            }
+            return res.status(503).json({
+                success: false,
+                error: 'WhatsApp not connected. Please scan QR code first.',
+                qrAvailable: !!qrCodeData
+            });
+        }
+
+        const data = req.body;
+
+        if (!data.phone_number) {
+            return res.status(400).json({
+                success: false,
+                error: 'Phone number is required'
+            });
+        }
+
+        if (!data.habit_name) {
+            return res.status(400).json({
+                success: false,
+                error: 'Habit name is required'
+            });
+        }
+
+        const phoneNumber = formatPhoneNumber(data.phone_number);
+        const message = formatHabitMessage(data);
+
+        console.log(`📱 Sending habit reminder to: ${data.phone_number}`);
+        console.log(`   Habit: ${data.habit_icon || '📝'} ${data.habit_name}`);
+
+        await sock.sendMessage(phoneNumber, { text: message });
+
+        console.log(`✅ Habit reminder sent to ${data.phone_number}`);
+
+        res.json({
+            success: true,
+            message: 'Habit reminder sent successfully',
+            data: {
+                phone_number: data.phone_number,
+                habit_name: data.habit_name,
+                sent_at: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Error sending habit reminder:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Health check for habits
+app.get('/habit-status', (req, res) => {
+    res.json({
+        success: true,
+        service: 'habit-reminders',
+        whatsappReady: isReady,
+        isInitializing: isInitializing,
+        hasQR: !!qrCodeData,
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.post('/init', async (req, res) => {
