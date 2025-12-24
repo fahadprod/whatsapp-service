@@ -11,8 +11,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const habitRoutes = require('./routes/habits');
-app.use('/api', habitRoutes);
+// const habitRoutes = require('./routes/habits');
+// app.use('/api', habitRoutes);
 
 let sock = null;
 let isReady = false;
